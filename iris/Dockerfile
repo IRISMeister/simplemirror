@@ -1,4 +1,4 @@
-FROM containers.intersystems.com/intersystems/iris:2023.1.1.380.0
+FROM containers.intersystems.com/intersystems/iris:2024.1
 
 ENV SRCDIR=src
 ENV BISRCDIR=Samples-BI/src

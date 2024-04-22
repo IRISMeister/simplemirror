@@ -1,9 +1,3 @@
-version: '3.7'
-x-var: &ARBITER_IMAGE
-  "containers.intersystems.com/intersystems/arbiter:2023.1.1.380.0"
-x-var: &WEBGW_IMAGE
-  "iris-webgateway-example_web:latest"
-
 services:
   ap1a:
     container_name: ap1a
@@ -230,7 +224,7 @@ services:
   arbiter:
     container_name: arbiter
     hostname: arbiter
-    image: *ARBITER_IMAGE
+    image: containers.intersystems.com/intersystems/arbiter:2024.1
     init: true    
     command: 
       - /usr/local/etc/irissys/startISCAgent.sh 2188
@@ -241,67 +235,43 @@ services:
         ipv4_address: 10.0.100.10
 
   webgw1:
-    container_name: webgw
-    hostname: webgw
-    image: *WEBGW_IMAGE
-    init: true    
-    environment:
-      - TZ=JST-9
-      - CONFIG_NAME=ap1a
-      - SERVER_HOST=10.0.100.2
-      - SERVER_PORT=1972
-      - CONFIG_NAME2=ap1b
-      - SERVER_HOST2=10.0.100.3
-      - SERVER_PORT2=1972
-      - CONFIG_NAME3=ap1d
-      - SERVER_HOST3=10.0.100.4
-      - SERVER_PORT3=1972
-      - CONFIG_NAME4=ap2a
-      - SERVER_HOST4=10.0.100.5
-      - SERVER_PORT4=1972
-      - CONFIG_NAME5=ap2b
-      - SERVER_HOST5=10.0.100.6
-      - SERVER_PORT5=1972
-      - CONFIG_NAME6=ap2r
-      - SERVER_HOST6=10.0.100.7
-      - SERVER_PORT6=1972
-      - MIRROR_CONFIG_NAME=ap1
-      - MIRROR_CONFIG_NAME2=ap2
+    image: containers.intersystems.com/intersystems/webgateway:2024.1
+    init: true
+    container_name: webgw1
+    hostname: webgw1
     ports:
-      - "8080:80"
+    - "8080:80"
+    - "8883:443"
+    environment:
+    - TZ=JST-9
+    #- ISC_DATA_DIRECTORY=/webgateway-shared/durable
+    - ISC_CSP_CONF_FILE=/webgateway-shared/CSP.conf
+    - ISC_CSP_INI_FILE=/webgateway-shared/CSP.ini
+    volumes:
+    - type: bind
+      source: ./webgateway
+      target: /webgateway-shared
     networks:
       arbiter-tier:
         ipv4_address: 10.0.100.11
 
   webgw2:
+    image: containers.intersystems.com/intersystems/webgateway:2024.1
+    init: true
     container_name: webgw2
     hostname: webgw2
-    image: *WEBGW_IMAGE
-    init: true    
-    environment:
-      - TZ=JST-9
-      - CONFIG_NAME=ap1a
-      - SERVER_HOST=10.0.100.2
-      - SERVER_PORT=1972
-      - CONFIG_NAME2=ap1b
-      - SERVER_HOST2=10.0.100.3
-      - SERVER_PORT2=1972
-      - CONFIG_NAME3=ap1d
-      - SERVER_HOST3=10.0.100.4
-      - SERVER_PORT3=1972
-      - CONFIG_NAME4=ap2a
-      - SERVER_HOST4=10.0.100.5
-      - SERVER_PORT4=1972
-      - CONFIG_NAME5=ap2b
-      - SERVER_HOST5=10.0.100.6
-      - SERVER_PORT5=1972
-      - CONFIG_NAME6=ap2r
-      - SERVER_HOST6=10.0.100.7
-      - SERVER_PORT6=1972
-      - MIRROR_CONFIG_NAME=ap1
-      - MIRROR_CONFIG_NAME2=ap2
     ports:
-      - "8081:80"
+    - "8081:80"
+    - "8884:443"
+    environment:
+    - TZ=JST-9
+    #- ISC_DATA_DIRECTORY=/webgateway-shared/durable
+    - ISC_CSP_CONF_FILE=/webgateway-shared/CSP.conf
+    - ISC_CSP_INI_FILE=/webgateway-shared/CSP.ini
+    volumes:
+    - type: bind
+      source: ./webgateway
+      target: /webgateway-shared
     networks:
       arbiter-tier:
         ipv4_address: 10.0.100.12

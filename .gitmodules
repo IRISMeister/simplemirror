@@ -1,6 +1,3 @@
-[submodule "iris-webgateway-example"]
-	path = iris-webgateway-example
-	url = https://github.com/caretdev/iris-webgateway-example.git
 [submodule "iris/Samples-BI"]
 	path = iris/Samples-BI
 	url = https://github.com/intersystems/Samples-BI.git

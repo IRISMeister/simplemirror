@@ -92,6 +92,7 @@ ClassMethod enableMirrorService() As %Status
 
 ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB") As %Status
 {
+  //#define LOTSOFDB 1
   Set tSC='$$$OK
   Try {
     set dir="/DB/"
@@ -111,6 +112,15 @@ ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB")
     set Properties("Directory")=dir_dirName
     do ##class(Config.Databases).Create(mirDBName,.Properties)
 
+#ifdef LOTSOFDB
+    For i=1:1:255 {
+      write !, "Creating databases #:"_i,!
+      do ##class(%Library.File).CreateNewDir(dir,dirName_i)
+      // Add DB to config
+      set Properties("Directory")=dir_dirName_i
+      do ##class(Config.Databases).Create(mirDBName_i,.Properties)
+    }
+#endif
     // wait until mirror's ready
     for i=1:1:30 {
       h 1
@@ -130,7 +140,19 @@ ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB")
       write !,"Database creation failed!"
       $$$ThrowOnError(tSC)
     }
-    
+
+#ifdef LOTSOFDB
+    Set dbsize=1
+    For i=1:1:255 {
+      write !, "Creating databases file :"_dir_dirName_i_" "_mirDBName_i
+      set tSC = ##class(SYS.Database).CreateDatabase(dir_dirName_i,dbsize,,,,,mirDBName_i,mirrorName)
+      if 'tSC { 
+        write !,"Database creation failed!"
+        $$$ThrowOnError(tSC)
+      }
+    }
+#endif
+
     // Create namespace for mirrored database
     set ns("Globals")=mirDBName
     set ns("Routines")=mirDBName
@@ -142,6 +164,22 @@ ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB")
     }
     // Enables production
     Do ##class(%EnsembleMgr).EnableNamespace(mirNSName,0)
+
+#ifdef LOTSOFDB
+    For i=1:1:255 {
+      write !, "Creating namespace #:"_mirNSName_i_" on "_mirDBName_i
+      k ns
+      set ns("Globals")=mirDBName_i
+      set ns("Routines")=mirDBName_i
+      do ##class(Config.Namespaces).Create(mirNSName_i,.ns)
+      set tSC = ##class(Config.Namespaces).Exists(mirNSName_i,.obj,.status)
+      if 'tSC {
+        write !, "NS creation failed. #:"_i
+        zw status
+        $$$ThrowOnError(status)
+      }
+    }
+#endif    
 
     Set tSC=..EnableWebApps()  //create a web app
     $$$ThrowOnError(tSC)
