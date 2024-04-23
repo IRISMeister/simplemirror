@@ -3,4 +3,4 @@ PasswordHash=FBFE8593AEFA510C27FD184738D6E865A441DE98,u4ocm4qh
 
 [config]
 globals=0,0,128,0,0,0
-gmheap=256000
+gmheap=512000

@@ -1,10 +1,20 @@
 {
+    "intersystems.servers": {
+
+        "iris": {
+            "webServer": {
+                "scheme": "http",
+                "host": "localhost",
+                "port": 8080,
+                "pathPrefix": "/ap1a"
+            },
+            "username": "_SYSTEM",
+            "password": "SYS"
+        }
+    },
     "objectscript.conn": {
+        "server": "iris",
         "ns": "MIRRORNS",
-        "host": "localhost",
-        "port": 9092,
-        "username": "SuperUser",
-        "password": "SYS",
         "active": true
     }
 }

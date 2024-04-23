@@ -1,0 +1,20 @@
+ROUTINE test
+#define dbcount 256
+test() public {
+    new $NAMESPACE
+    for i=1:1:10000 {
+        for j=1:1:$$$dbcount {
+            Set $NAMESPACE="MIRRORNS"_j
+            For k=1:1:100 {
+                Set ^a($INCREMENT(^a))=$ZDATETIME($NOW())
+            }
+        }
+    }
+}
+clear() public {
+    new $NAMESPACE
+    for j=1:1:$$$dbcount {
+        Set $NAMESPACE="MIRRORNS"_j
+        k ^a
+    }
+}

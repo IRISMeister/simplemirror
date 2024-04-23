@@ -22,8 +22,6 @@ services:
       - ECPAddress_ip=10.0.100.2
       - CSPConfigName=ap1,ap1a
       - TZ=JST-9
-    ports:
-      - "9092:52773"
     command:
       --key /ISC/utiles/iris.key
       -a /ISC/utiles/installer.sh
@@ -60,8 +58,6 @@ services:
       - ECPAddress_ip=10.0.100.3
       - CSPConfigName=ap1,ap1b
       - TZ=JST-9
-    ports:
-      - "9093:52773"
     command:
       --key /ISC/utiles/iris.key
       -a /ISC/utiles/installer.sh
@@ -97,8 +93,6 @@ services:
       - MIRRORROLE=DR
       - CSPConfigName=ap1,ap1d
       - TZ=JST-9
-    ports:
-      - "9094:52773"
     command:
       --key /ISC/utiles/iris.key
       -a /ISC/utiles/installer.sh
@@ -134,8 +128,6 @@ services:
       - MIRRORROLE=PRIMARY
       - CSPConfigName=ap2,ap2a
       - TZ=JST-9
-    ports:
-      - "9095:52773"
     command:
       --key /ISC/utiles/iris.key
       -a /ISC/utiles/installer.sh
@@ -171,8 +163,6 @@ services:
       - MIRRORROLE=BACKUP
       - CSPConfigName=ap2,ap2b
       - TZ=JST-9
-    ports:
-      - "9096:52773"
     command:
       --key /ISC/utiles/iris.key
       -a /ISC/utiles/installer.sh
@@ -209,8 +199,6 @@ services:
       - MIRRORROLE=REPORTRW
       - CSPConfigName=ap2,ap2r
       - TZ=JST-9
-    ports:
-      - "9097:52773"
     command:
       --key /ISC/utiles/iris.key
       -a /ISC/utiles/installer.sh

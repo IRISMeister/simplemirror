@@ -1,4 +1,4 @@
-Include %occInclude
+Include (%occInclude, %syConfig)
 
 Class Mirror.Installer
 {
@@ -93,6 +93,7 @@ ClassMethod enableMirrorService() As %Status
 ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB") As %Status
 {
   //#define LOTSOFDB 1
+  #define DBCOUNT 256
   Set tSC='$$$OK
   Try {
     set dir="/DB/"
@@ -112,15 +113,6 @@ ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB")
     set Properties("Directory")=dir_dirName
     do ##class(Config.Databases).Create(mirDBName,.Properties)
 
-#ifdef LOTSOFDB
-    For i=1:1:255 {
-      write !, "Creating databases #:"_i,!
-      do ##class(%Library.File).CreateNewDir(dir,dirName_i)
-      // Add DB to config
-      set Properties("Directory")=dir_dirName_i
-      do ##class(Config.Databases).Create(mirDBName_i,.Properties)
-    }
-#endif
     // wait until mirror's ready
     for i=1:1:30 {
       h 1
@@ -141,48 +133,69 @@ ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB")
       $$$ThrowOnError(tSC)
     }
 
-#ifdef LOTSOFDB
-    Set dbsize=1
-    For i=1:1:255 {
-      write !, "Creating databases file :"_dir_dirName_i_" "_mirDBName_i
-      set tSC = ##class(SYS.Database).CreateDatabase(dir_dirName_i,dbsize,,,,,mirDBName_i,mirrorName)
-      if 'tSC { 
-        write !,"Database creation failed!"
-        $$$ThrowOnError(tSC)
-      }
-    }
-#endif
-
     // Create namespace for mirrored database
     set ns("Globals")=mirDBName
     set ns("Routines")=mirDBName
     do ##class(Config.Namespaces).Create(mirNSName,.ns)
-    set tSC = ##class(Config.Namespaces).Exists(mirNSName,.obj,.status)
-    if 'tSC {
+    set bool = ##class(Config.Namespaces).Exists(mirNSName,.obj,.status)
+    if 'bool {
       write !, "NS creation failed."
-      $$$ThrowOnError(tSC)
+      $$$ThrowOnError(status)
     }
     // Enables production
     Do ##class(%EnsembleMgr).EnableNamespace(mirNSName,0)
 
-#ifdef LOTSOFDB
-    For i=1:1:255 {
-      write !, "Creating namespace #:"_mirNSName_i_" on "_mirDBName_i
-      k ns
-      set ns("Globals")=mirDBName_i
-      set ns("Routines")=mirDBName_i
-      do ##class(Config.Namespaces).Create(mirNSName_i,.ns)
-      set tSC = ##class(Config.Namespaces).Exists(mirNSName_i,.obj,.status)
-      if 'tSC {
-        write !, "NS creation failed. #:"_i
-        zw status
-        $$$ThrowOnError(status)
-      }
-    }
-#endif    
-
     Set tSC=..EnableWebApps()  //create a web app
     $$$ThrowOnError(tSC)
+
+#ifdef LOTSOFDB
+    For i=1:1:$$$DBCOUNT {
+      write !, "Creating databases file #:"_i
+      do ##class(%Library.File).CreateNewDir(dir,dirName_i)
+      // Add DB to config
+      set Properties("Directory")=dir_dirName_i
+      do ##class(Config.Databases).Create(mirDBName_i,.Properties)
+    }
+
+    For i=1:1:$$$DBCOUNT {
+      #; retry
+      For j=1:1:10 {
+        Set dbsize=1
+        write !, "Creating databases definition :"_dir_dirName_i_" "_mirDBName_i
+        set tSC = ##class(SYS.Database).CreateDatabase(dir_dirName_i,dbsize,,,,,mirDBName_i,mirrorName)
+        if tSC=$$$OK quit
+        if 'tSC { 
+          write !,"Database definition creation failed!" zw tSC
+          //$$$ThrowOnError(tSC)
+        }
+        if j=10 $$$ThrowOnError(tSC)
+      }
+    }
+
+    For i=1:1:$$$DBCOUNT {
+      #; retry
+      For j=1:1:10 {
+        write !, "Creating namespace #:"_mirNSName_i_" on "_mirDBName_i
+        k props
+        set props("Globals")=mirDBName_i
+        set props("Routines")=mirDBName_i
+        Set Flags=$$$CPFSave+$$$CPFWrite // 都度Activateすると大量のSMHを消費し、一時的に不足する可能性が増す
+        Do ##class(Config.Namespaces).Create(mirNSName_i,.props,,Flags)
+        set bool = ##class(Config.Namespaces).Exists(mirNSName_i,.obj,.status)
+        if bool=$$$OK quit
+        if 'bool {
+          write !, "NS creation failed. #:"_i,!
+          h 1
+        }
+        if j=10 {
+          w ! zw status
+          $$$ThrowOnError(status)
+        }
+      }
+    }
+    Set tSC=##class(Config.CPF).Activate()
+    $$$ThrowOnError(tSC)
+#endif    
 
 	} Catch(e) {
 		Set tSC=e.AsStatus()
@@ -190,6 +203,26 @@ ClassMethod createMirrorDB(role, mirNSName = "MIRRORNS", mirDBName = "MIRRORDB")
 	}
 
   Return tSC
+}
+
+ClassMethod DatabaseTimeLatency(member = "AP1B/IRIS") As %String
+{
+  New $NAMESPACE
+  Set $NAMESPACE="%SYS"
+  set mirname="MIRRORSET"
+  Set DatabaseTimeLatency=""
+	Set tRS = ##class(%Library.ResultSet).%New("SYS.Mirror:MemberStatusList")
+	Do tRS.Execute(mirname)
+	while tRS.Next() {
+		s name=tRS.Data("MemberName")
+    If name=member {
+		  ;s jrntimelatency=tRS.Data("JournalTimeLatency")
+      s DatabaseTimeLatency=tRS.Data("DatabaseTimeLatency")
+      quit
+    }
+	}
+  w DatabaseTimeLatency,!
+  Return DatabaseTimeLatency
 }
 
 ClassMethod EnableWebApps(ns = "mirrorns") As %Status
