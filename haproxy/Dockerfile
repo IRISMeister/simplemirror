@@ -1,4 +1,4 @@
-FROM haproxy:2.3.5
+FROM haproxy:2.3.15
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt update 

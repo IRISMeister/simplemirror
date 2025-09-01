@@ -45,10 +45,10 @@ $ docker-compose logs ap1b
 |nginx|nginx|80|LB。Web gateway用のreverse proxyとして機能|外部LB|
 |webgw1|ビルド|8080|Web gateway #1|EC2|
 |webgw2|ビルド|8081|Web gateway #2|EC2|
-|ap1a|iris|9092|ミラーセットAP1のメンバ|EC2|
-|ap1b|iris|9093|ミラーセットAP1のメンバ|EC2|
-|ap2a|iris|9094|ミラーセットAP2のメンバ|EC2|
-|ap2b|iris|9095|ミラーセットAP2のメンバ|EC2|
+|ap1a|iris|NA|ミラーセットAP1のメンバ|EC2|
+|ap1b|iris|NA|ミラーセットAP1のメンバ|EC2|
+|ap2a|iris|NA|ミラーセットAP2のメンバ|EC2|
+|ap2b|iris|NA|ミラーセットAP2のメンバ|EC2|
 |haproxy|ビルド|80|LB。IRIS SuperServer用のreverse proxyとして機能|内部LB|
 
 - AP1,AP2はそれぞれHAミラークラスタを構成する単位です。AP1はap1a,ap1bコンテナで構成されます。同様にAP2はap2a,ap2bコンテナで構成されます。以後、ミラーセットAP1,ミラーセットAP2と称します。
@@ -69,12 +69,6 @@ Webサーバが複数(専用Apache×2, IRIS同梱のApache×4, LB代わりのNGI
 
 |要素|エンドポイント|備考|
 |:--|:--|:--|
-|AP1A組み込みApache|http://irishost:9092/csp/bin/Systems/Module.cxw|You are not authorized to use this facility,未使用|
-|AP1B組み込みApache|http://irishost:9093/csp/bin/Systems/Module.cxw|You are not authorized to use this facility,未使用|
-|AP1D組み込みApache|http://irishost:9094/csp/bin/Systems/Module.cxw|You are not authorized to use this facility,未使用|
-|AP2A組み込みApache|http://irishost:9095/csp/bin/Systems/Module.cxw|You are not authorized to use this facility,未使用|
-|AP2B組み込みApache|http://irishost:9096/csp/bin/Systems/Module.cxw|You are not authorized to use this facility,未使用|
-|AP2R組み込みApache|http://irishost:9097/csp/bin/Systems/Module.cxw|You are not authorized to use this facility,未使用|
 |Web Gateway#1|http://irishost:8080/csp/bin/Systems/Module.cxw||
 |Web Gateway#2|http://irishost:8081/csp/bin/Systems/Module.cxw||
 |NGINX|http://irishost/csp/bin/Systems/Module.cxw|本用途に不向き|
@@ -84,12 +78,6 @@ Webサーバが複数(専用Apache×2, IRIS同梱のApache×4, LB代わりのNGI
 
 |要素|エンドポイント|備考|
 |:--|:--|:--|
-|AP1A組み込みApache|http://irishost:9092/csp/sys/%25CSP.Portal.Home.zen||
-|AP1B組み込みApache|http://irishost:9093/csp/sys/%25CSP.Portal.Home.zen||
-|AP1D組み込みApache|http://irishost:9094/csp/sys/%25CSP.Portal.Home.zen||
-|AP2A組み込みApache|http://irishost:9095/csp/sys/%25CSP.Portal.Home.zen||
-|AP2B組み込みApache|http://irishost:9096/csp/sys/%25CSP.Portal.Home.zen||
-|AP2R組み込みApache|http://irishost:9097/csp/sys/%25CSP.Portal.Home.zen||
 |Web Gateway#1|http://irishost:8080/ap1a/csp/sys/%25CSP.Portal.Home.zen|AP1A|
 |Web Gateway#1|http://irishost:8080/ap1b/csp/sys/%25CSP.Portal.Home.zen|AP1B|
 |Web Gateway#1|http://irishost:8080/ap1d/csp/sys/%25CSP.Portal.Home.zen|AP1D|
@@ -111,12 +99,6 @@ Webサーバが複数(専用Apache×2, IRIS同梱のApache×4, LB代わりのNGI
 
 |要素|エンドポイント|備考|
 |:--|:--|:--|
-|AP1A組み込みApache|http://irishost:9092/api/mgmnt/||
-|AP1B組み込みApache|http://irishost:9093/api/mgmnt/||
-|AP1D組み込みApache|http://irishost:9094/api/mgmnt/||
-|AP2A組み込みApache|http://irishost:9095/api/mgmnt/||
-|AP2B組み込みApache|http://irishost:9096/api/mgmnt/||
-|AP2R組み込みApache|http://irishost:9097/api/mgmnt/||
 |Web Gateway#1|http://irishost:8080/ap1a/api/mgmnt/|AP1A|
 |Web Gateway#1|http://irishost:8080/ap1b/api/mgmnt/|AP1B|
 |Web Gateway#1|http://irishost:8080/ap1d/api/mgmnt/|AP1D|
@@ -136,7 +118,7 @@ Webサーバが複数(専用Apache×2, IRIS同梱のApache×4, LB代わりのNGI
 
 - アクセス時には認証が必要です
 ```
-$ curl http://irishost:9092/api/mgmnt/ -u SuperUser:SYS -s | jq
+$ curl http://irishost:8080/ap1a/api/mgmnt/ -u SuperUser:SYS -s | jq
 ```
 
 ## Health Check 

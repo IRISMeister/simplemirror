@@ -27,10 +27,6 @@ $ ./start.sh
 
 web g/w portal
 ```
-http://irishost:9092/csp/bin/Systems/Module.cxw      (built-in apache for AP1A) ->You are not authorized to use this facility
-http://irishost:9093/csp/bin/Systems/Module.cxw      (built-in apache for AP1B) ->You are not authorized to use this facility
-http://irishost:9094/csp/bin/Systems/Module.cxw      (built-in apache for AP2A) ->You are not authorized to use this facility
-http://irishost:9095/csp/bin/Systems/Module.cxw      (built-in apache for AP2B) ->You are not authorized to use this facility
 http://irishost:8080/csp/bin/Systems/Module.cxw      (webgw1)
 http://irishost:8081/csp/bin/Systems/Module.cxw      (webgw2)
 http://irishost/csp/bin/Systems/Module.cxw           (via NGINX to webgw1 or webgw2)-> Don't use this
@@ -38,10 +34,6 @@ http://irishost/csp/bin/Systems/Module.cxw           (via NGINX to webgw1 or web
 
 system management portal
 ```
-http://irishost:9092/csp/sys/%25CSP.Portal.Home.zen  (via built-in apache for AP1A)
-http://irishost:9093/csp/sys/%25CSP.Portal.Home.zen  (via built-in apache for AP1B)
-http://irishost:9094/csp/sys/%25CSP.Portal.Home.zen  (via built-in apache for AP2A)
-http://irishost:9095/csp/sys/%25CSP.Portal.Home.zen  (via built-in apache for AP2B)
 http://irishost:8080/ap1a/csp/sys/%25CSP.Portal.Home.zen  (via webgw1, AP1A)
 http://irishost:8080/ap1b/csp/sys/%25CSP.Portal.Home.zen  (via webgw1, AP1B)
 http://irishost:8080/ap2a/csp/sys/%25CSP.Portal.Home.zen  (via webgw1, AP2A)
@@ -59,10 +51,6 @@ http://irishost:8081/ap2/csp/sys/%25CSP.Portal.Home.zen  (via webgw2, primary me
 
 IRIS provided REST APIs
 ```
-http://irishost:9092/api/mgmnt/ -u SuperUser:SYS  (via built-in apache for AP1A)
-http://irishost:9093/api/mgmnt/ -u SuperUser:SYS  (via built-in apache for AP1B)
-http://irishost:9094/api/mgmnt/ -u SuperUser:SYS  (via built-in apache for AP2A)
-http://irishost:9095/api/mgmnt/ -u SuperUser:SYS  (via built-in apache for AP2B)
 http://irishost:8080/ap1a/api/mgmnt/ -u SuperUser:SYS  (via webgw1, AP1A)
 http://irishost:8080/ap1b/api/mgmnt/ -u SuperUser:SYS  (via webgw1, AP1B)
 http://irishost:8080/ap2a/api/mgmnt/ -u SuperUser:SYS  (via webgw1, AP2A)

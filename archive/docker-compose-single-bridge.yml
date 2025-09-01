@@ -29,8 +29,6 @@ services:
       - ECPAddress_ip=10.1.1.2
       - CSPConfigName=ap1,ap1a
       - TZ=JST-9
-    ports:
-      - "9092:52773"
     command:
       --key /ISC/utiles/iris.key
       -a /ISC/utiles/installer.sh

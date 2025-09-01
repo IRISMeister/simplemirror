@@ -212,7 +212,7 @@ services:
   arbiter:
     container_name: arbiter
     hostname: arbiter
-    image: containers.intersystems.com/intersystems/arbiter:2024.1
+    image: irepo.intersystems.com/intersystems/arbiter:2025.1
     init: true    
     command: 
       - /usr/local/etc/irissys/startISCAgent.sh 2188
@@ -223,7 +223,7 @@ services:
         ipv4_address: 10.0.100.10
 
   webgw1:
-    image: containers.intersystems.com/intersystems/webgateway:2024.1
+    image: irepo.intersystems.com/intersystems/webgateway:2025.1
     init: true
     container_name: webgw1
     hostname: webgw1
@@ -244,7 +244,7 @@ services:
         ipv4_address: 10.0.100.11
 
   webgw2:
-    image: containers.intersystems.com/intersystems/webgateway:2024.1
+    image: irepo.intersystems.com/intersystems/webgateway:2025.1
     init: true
     container_name: webgw2
     hostname: webgw2
