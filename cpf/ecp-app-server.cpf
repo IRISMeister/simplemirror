@@ -1,0 +1,13 @@
+[Startup]
+PasswordHash=FBFE8593AEFA510C27FD184738D6E865A441DE98,u4ocm4qh
+
+[ECPServers]
+IRIS-0=ap1a,1972,1
+
+[config]
+globals=0,0,128,0,0,0
+gmheap=512000
+
+[Actions]
+CreateDatabase:Name=REM_MIRRORDB,Directory=:mirror:MIRRORSET:MIRRORDB,Server=IRIS-0,LogicalOnly=1
+CreateNamespace:Name=MIRRORNS,Globals=REM_MIRRORDB,Routines=REM_MIRRORDB

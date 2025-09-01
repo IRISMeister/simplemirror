@@ -50,6 +50,7 @@ $ docker-compose logs ap1b
 |ap2a|iris|NA|ミラーセットAP2のメンバ|EC2|
 |ap2b|iris|NA|ミラーセットAP2のメンバ|EC2|
 |haproxy|ビルド|80|LB。IRIS SuperServer用のreverse proxyとして機能|内部LB|
+|ap1ecpapp|iris|NA|AP1のECPクライアント|EC2|
 
 - AP1,AP2はそれぞれHAミラークラスタを構成する単位です。AP1はap1a,ap1bコンテナで構成されます。同様にAP2はap2a,ap2bコンテナで構成されます。以後、ミラーセットAP1,ミラーセットAP2と称します。
 - Web gateway #1と#2は負荷分散目的で、全く同じ構成を持ちます。
@@ -78,6 +79,7 @@ Webサーバが複数(専用Apache×2, IRIS同梱のApache×4, LB代わりのNGI
 
 |要素|エンドポイント|備考|
 |:--|:--|:--|
+|Web Gateway#1|http://irishost:8080/csp/sys/%25CSP.Portal.Home.zen|AP1ECPAPP|
 |Web Gateway#1|http://irishost:8080/ap1a/csp/sys/%25CSP.Portal.Home.zen|AP1A|
 |Web Gateway#1|http://irishost:8080/ap1b/csp/sys/%25CSP.Portal.Home.zen|AP1B|
 |Web Gateway#1|http://irishost:8080/ap1d/csp/sys/%25CSP.Portal.Home.zen|AP1D|
@@ -434,6 +436,24 @@ jdbc:IRIS://irishost:1972/mirrorns  (ap1のプライマリメンバ)
 jdbc:IRIS://irishost:11972/mirrorns (ap2のプライマリメンバ)  
 select * from User_Report.Record
 ```
+
+# ECPクライアント
+
+ap1ecpappをap1a, ap1bのミラーに対するECPクライアントとして構成をしてあります。
+
+```
+$ docker compose exec ap1ecpapp iris session iris -UMIRRORNS
+Node: ap1ecpapp, Instance: IRIS
+MIRRORNS>s ^a=123
+MIRRORNS>h
+
+$ docker compose exec ap1a iris session iris -UMIRRORNS
+ノード: ap1a インスタンス: IRIS
+MIRRORNS>w ^a
+123
+
+```
+
 # DR非同期のミラーリングの切替え、切戻しについて
 
 [こちら](about_dr_failover.md)を参照ください。

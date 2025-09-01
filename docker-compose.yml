@@ -209,6 +209,30 @@ services:
       arbiter-tier:
         ipv4_address: 10.0.100.7
 
+  ap1ecpapp:
+    container_name: ap1ecpapp
+    hostname: ap1ecpapp
+    image: irepo.intersystems.com/intersystems/iris:2025.1
+    depends_on:
+      - ap1a
+      - ap1b
+    init: true    
+    volumes:
+      - ./:/ISC/utiles
+      - ./cpf:/cpf
+    environment:
+      - ISC_CPF_MERGE_FILE=/cpf/ecp-app-server.cpf
+      - TZ=JST-9
+    command:
+      --key /ISC/utiles/iris.key
+      --check-caps false
+
+    networks:
+      iris-tier:
+        ipv4_address: 10.0.1.9
+      arbiter-tier:
+        ipv4_address: 10.0.100.9
+
   arbiter:
     container_name: arbiter
     hostname: arbiter
