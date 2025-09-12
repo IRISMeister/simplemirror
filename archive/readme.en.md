@@ -16,7 +16,7 @@ You have to build it after overwrting webgateway-entrypoint.sh and webgateway.co
 $ git clone --recursive https://github.com/IRISMeister/simplemirror.git
 $ cd simplemirror
 $ cp ./webgateway* iris-webgateway-example/
-$ docker-compose -f iris-webgateway-example/docker-compose.yml build
+$ docker compose -f iris-webgateway-example/docker compose.yml build
 $ place ./iris.key (valid iris license key for container)
 $ ./start-single-bridge.sh   (mimics typical cloud env where you have only one NIC)
 or
@@ -102,7 +102,7 @@ FALIED
 
 ## app1a:down, app1b:Primary
 ```
-$ docker-compose -f docker-compose-single-ni.yml exec ap1a iris stop iris quietly
+$ docker compose -f docker compose-single-ni.yml exec ap1a iris stop iris quietly
 $ curl -m 5 http://irishost:8080/ap1b/csp/mirror_status.cxw -v
 < HTTP/1.1 200 OK
 SUCCESS
@@ -110,14 +110,14 @@ SUCCESS
 
 ## app1a:down, app1b:down
 ```
-$ docker-compose -f docker-compose-single-ni.yml exec ap1b iris stop iris quietly
+$ docker compose -f docker compose-single-ni.yml exec ap1b iris stop iris quietly
 $ curl -m 5 http://irishost:8080/ap1a/csp//mirror_status.cxw -v
 ```
 curl timeouts... LB shold handle this.
 
 ## app1a:Primary, app1b:down
 ```
-$ docker-compose -f docker-compose-single-ni.yml exec ap1a iris start iris quietly
+$ docker compose -f docker compose-single-ni.yml exec ap1a iris start iris quietly
 $ curl -m 5 http://irishost:8080/ap1a/csp//mirror_status.cxw -v
 < HTTP/1.1 200 OK
 SUCCESS
@@ -153,7 +153,7 @@ $ curl http://irishost/ap1/csp/mirrorns/api/get -s | jq
 
 ## app1a:down, app1b:Primary
 ```
-$ docker-compose -f docker-compose-single-ni.yml exec ap1a iris stop iris quietly
+$ docker compose -f docker compose-single-ni.yml exec ap1a iris stop iris quietly
 $ curl http://irishost/ap1/csp/mirrorns/api/get -s | jq
 {
   "HostName": "ap1b",
@@ -166,14 +166,14 @@ $ curl http://irishost/ap1/csp/mirrorns/api/get -s | jq
 
 ## app1a:down, app1b:down
 ```
-$ docker-compose -f docker-compose-single-ni.yml exec ap1b iris stop iris quietly
+$ docker compose -f docker compose-single-ni.yml exec ap1b iris stop iris quietly
 $ curl http://irishost/ap1/csp/mirrorns/api/get 
 ```
 Timeouts. Tooks a while.
 
 ## app1a:Primary, app1b:down
 ```
-$ docker-compose -f docker-compose-single-ni.yml exec ap1a iris start iris quietly
+$ docker compose -f docker compose-single-ni.yml exec ap1a iris start iris quietly
 $ curl http://irishost/ap1/csp/mirrorns/api/get -s | jq
 {
   "HostName": "ap1a",
@@ -186,7 +186,7 @@ $ curl http://irishost/ap1/csp/mirrorns/api/get -s | jq
 
 ## app1a:Primary, app1b:down, webgw1:down
 ```
-$ docker-compose stop webgw1
+$ docker compose stop webgw1
 Stopping webgw ... done
 $ curl http://irishost/ap1/csp/mirrorns/api/get -s | jq
 {
@@ -228,7 +228,7 @@ $ docker network disconnect simplemirror_iris-tier mirrorB ; docker network disc
 ...mirrorA will be switche to "agent controlled mode"
 
 ```
-$ docker-compose exec mirrorB iris session iris -U %SYS MIRROR
+$ docker compose exec mirrorB iris session iris -U %SYS MIRROR
 %SYS>D ^MIRROR
 1) Mirror Status
 4) Status Monitor
@@ -273,7 +273,7 @@ $ docker network connect simplemirror_iris-tier mirrorA
 ```
 ...eventually mirrorA will be force shutdown.
 ```
-$ docker-compose exec mirrorA iris list
+$ docker compose exec mirrorA iris list
         status:       down, last used Thu Dec 24 09:21:10 2020
 ```
 

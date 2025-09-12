@@ -11,7 +11,7 @@ $ cp ミラーが有効なx64コンテナ用のライセンスキー ./iris.key
 ```
 $ ./start-all.sh
 ```
-> docker-compose up で起動しないでください。起動手順にdocker-composeでは制御しきれない依存関係があります。
+> docker compose up で起動しないでください。起動手順にdocker composeでは制御しきれない依存関係があります。
 > また、特定のコンポーネントの起動・停止状態を可能とするために、意図的に依存性(depends_on)をはずしています。
 
 多数のコンテナ(11個、うち6個がIRISインスタンス)が作成されるため、多数のCPU/メモリ消費とDISK I/Oが発生します。コンテナ実行環境によっては不測のエラーが発生するかもしれません。目的に応じてより軽量な環境を起動する事が出来ます。
@@ -34,8 +34,8 @@ $ ./stop.sh
 # うまく動作しない場合
 起動中にIRIS内でエラーが発生した場合、各サービスの出力にエラーが記録されています。
 ```
-$ docker-compose logs ap1a
-$ docker-compose logs ap1b
+$ docker compose logs ap1a
+$ docker compose logs ap1b
 ```
 
 # コンテナ群
@@ -58,7 +58,7 @@ $ docker-compose logs ap1b
 - haproxyはIRISのSuperServerをアップストリームに持つreverse proxyとして構成され、ミラーのVirtual IPの代替えとして機能します。
 - 各コンテナは、ポート番号が重複しないように、ポートを変更してホストO/Sにエンドポイントを公開しています。  
 - IRISの構成には[cpfマージ](cpf/merge.cpf)を使用しています。ミラー構成のために、gmheapを増やしています。
-- 各コンテナ要素をAWSの要素に置き換えて考えることができます。その場合、docker-composeはVPC環境、ホストO/SはVPCの外側に相当すると考えます。
+- 各コンテナ要素をAWSの要素に置き換えて考えることができます。その場合、docker composeはVPC環境、ホストO/SはVPCの外側に相当すると考えます。
 
 ![構成図](https://github.com/IRISMeister/doc-images/blob/main/simplemirror/diagram.png)
 
@@ -201,7 +201,7 @@ $ curl http://irishost/ap2/csp/user/api/get -s | jq
 ```
 NGINXのログは下記のようになっているはずです。10.0.100.11:80(Web Gateway #1),10.0.100.12:80(Web Gateway #2)が交互に使用されています。
 ```
-$ docker-compose logs -f nginx
+$ docker compose logs -f nginx
 nginx      | 10.0.100.1 - - [09/Feb/2023:12:36:26 +0900] "GET /ap1/csp/user/api/get HTTP/1.1" 200 103 "-" "curl/7.81.0" "-" "10.0.100.12:80"
 nginx      | 10.0.100.1 - - [09/Feb/2023:12:36:40 +0900] "GET /ap2/csp/user/api/get HTTP/1.1" 200 103 "-" "curl/7.81.0" "-" "10.0.100.11:80"
 ```
@@ -233,7 +233,7 @@ ap1aが応答しなくなったため、curlでtimeout(5秒)が発生しまし�
 > NGINXのActive Healthcheckが利用できる環境であれば、この接続は無効にマークされますが、前述の通り、本例はPassive Healthcheckでの動作ですので、この応答は利用していません。
 
 ```
-$ docker-compose exec ap1a iris stop iris quietly
+$ docker compose exec ap1a iris stop iris quietly
 $ curl -m 5 http://irishost:8080/ap1a/csp/mirror_status.cxw -v
 curl: (28) Operation timed out after 5001 milliseconds with 0 bytes received
 $ curl -m 5 http://irishost:8080/ap1b/csp/mirror_status.cxw -v
@@ -256,7 +256,7 @@ $ curl http://irishost/ap1/csp/user/api/get -s | jq
 ap1ミラークラスタの全IRISメンバを停止状態にします。  
 Health Checkに誰も応答しないので、下記はいずれもcurlでtimeout(5秒)が発生しました。
 ```
-$ docker-compose exec ap1b iris stop iris quietly
+$ docker compose exec ap1b iris stop iris quietly
 $ curl -m 5 http://irishost:8080/ap1a/csp/mirror_status.cxw -v
 curl: (28) Operation timed out after 5001 milliseconds with 0 bytes received
 $ curl -m 5 http://irishost:8080/ap1b/csp/mirror_status.cxw -v
@@ -287,15 +287,15 @@ $ curl http://irishost/ap1/csp/user/api/get
 14:16:17にwebgw2にリクエストが来ますが、それが1分後にタイムアウトし、14:17:17にNGINXにその旨記録されています。NGINXはその後webgw1にリクエストしますが、それも1分後の14:18:17にタイムアウトし、NGINXにその旨が記録されています。
 
 ```
-$ docker-compose logs -f webgw1
+$ docker compose logs -f webgw1
   ・
   ・
 webgw      | 10.0.100.13 - - [09/Feb/2023:14:17:17 +0900] "GET /ap1/csp/user/api/get HTTP/1.0" 500 -
 
-$ docker-compose logs -f webgw2
+$ docker compose logs -f webgw2
 webgw2     | 10.0.100.13 - - [09/Feb/2023:14:16:17 +0900] "GET /ap1/csp/user/api/get HTTP/1.0" 500 -
 
-$ docker-compose logs -f nginx
+$ docker compose logs -f nginx
   ・
   ・
 nginx      | 2023/02/09 14:17:17 [warn] 28#28: *7 upstream server temporarily disabled while reading response header from upstream, client: 10.0.100.1, server: nginx, request: "GET /ap1/csp/user/api/get HTTP/1.1", upstream: "http://10.0.100.12:80/ap1/csp/user/api/get", host: "irishost"
@@ -309,7 +309,7 @@ nginx      | 2023/02/09 14:18:17 [error] 28#28: *7 upstream timed out (110: Conn
 ap1aを起動します。ap1aはプライマリになります。
 ap1bは停止状態のままですので、curlでtimeout(5秒)が発生しました。
 ```
-$ docker-compose exec ap1a iris start iris quietly
+$ docker compose exec ap1a iris start iris quietly
 $ curl -m 5 http://irishost:8080/ap1a/csp/mirror_status.cxw
 SUCCESS
 $ curl -m 5 http://irishost:8080/ap1b/csp/mirror_status.cxw
@@ -347,8 +347,8 @@ $ curl -m 5 http://irishost/ap1/csp/user/api/get?[1-100]
 Web gateway managementのSystem Statusで、どのような接続が作成されているかを確認する事ができます。  
 また、下記で、Web gatewayを再起動して接続やカウンタをリセットする事ができます。
 ```
-$ docker-compose restart webgw1
-$ docker-compose restart webgw2
+$ docker compose restart webgw1
+$ docker compose restart webgw2
 ```
 
 補足)
@@ -365,14 +365,14 @@ ap2rは非同期のレポーティングメンバとして稼働しています�
 
 下記コマンドで初期データをBIキューブに反映します。
 ```
-$ docker-compose exec ap2r iris session iris '##class(%DeepSee.Utils).%SynchronizeCube("HOLEFOODS",1)'
+$ docker compose exec ap2r iris session iris '##class(%DeepSee.Utils).%SynchronizeCube("HOLEFOODS",1)'
 1,883 fact(s) updated
 Elapsed time: .983161s
 ```
 
 下記コマンドで、件数が1,000になっていることを確認できます。
 ```
-docker-compose exec ap2r iris session iris "##class(%DeepSee.Utils).%Shell()"
+docker compose exec ap2r iris session iris "##class(%DeepSee.Utils).%Shell()"
 DeepSee Command Line Shell
 ----------------------------------------------------
 Enter q to quit, ? for help.
@@ -386,20 +386,20 @@ Elapsed time:       .112427s
 
 プライマリメンバで新たに10,000件のレコードを新規作成します。
 ```
-$ docker-compose exec ap2a iris session iris -UMIRRORNS "##class(HoleFoods.Utils).AddData(10000)"
+$ docker compose exec ap2a iris session iris -UMIRRORNS "##class(HoleFoods.Utils).AddData(10000)"
 10,000 row(s) created
 ```
 
 これらの差分を下記コマンドでBIキューブに反映します。
 ```
-$ docker-compose exec ap2r iris session iris '##class(%DeepSee.Utils).%SynchronizeCube("HOLEFOODS",1)'
+$ docker compose exec ap2r iris session iris '##class(%DeepSee.Utils).%SynchronizeCube("HOLEFOODS",1)'
 10,000 fact(s) updated
 Elapsed time: 4.419442s
 ```
 
 件数が上記で新規作成した件数だけ増加している事を確認します。
 ```
-docker-compose exec ap2r iris session iris "##class(%DeepSee.Utils).%Shell()"
+docker compose exec ap2r iris session iris "##class(%DeepSee.Utils).%Shell()"
 DeepSee Command Line Shell
 ----------------------------------------------------
 Enter q to quit, ? for help.
@@ -425,7 +425,7 @@ http://irishost:8080/ap2r/csp/user/_DeepSee.UI.Analyzer.zen?$NAMESPACE=MIRRORNS&
 |ap2|ap2a:1972,ap2b:1972|irishost:11972||
 
 ```
-$ docker-compose logs -f haproxy
+$ docker compose logs -f haproxy
 haproxy    | [WARNING] 056/112355 (9) : Server iris2/ap2a is UP, reason: External check passed, code: 0, check duration: 43ms. 1 active and 0 backup servers online. 0 sessions requeued, 0 total in queue.
 haproxy    | [WARNING] 056/112356 (9) : Server iris1/ap1a is UP, reason: External check passed, code: 0, check duration: 52ms. 1 active and 0 backup servers online. 0 sessions requeued, 0 total in queue.
 ```

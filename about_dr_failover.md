@@ -20,7 +20,7 @@ $ ./start-dr.sh
 
 	フェイルオーバ・プリマリメンバの場合
 	```
-	$ docker-compose exec ap1a iris session iris -U%SYS	 
+	$ docker compose exec ap1a iris session iris -U%SYS	 
 	ノード: ap1a インスタンス: IRIS
 
 	%SYS>w $system.Mirror.GetMemberType()
@@ -31,7 +31,7 @@ $ ./start-dr.sh
 	
 	DR非同期メンバの場合
 	```
-	$ docker-compose exec ap1d iris session iris -U%SYS	 
+	$ docker compose exec ap1d iris session iris -U%SYS	 
 	ノード: ap1d インスタンス: IRIS
 
 	%SYS>w $system.Mirror.GetMemberType()
@@ -53,7 +53,7 @@ $ ./start-dr.sh
 
 	以下のクラスメソッドの戻り値が 1の場合はジャーナルファイル転送およびデジャーナルにて遅延はない状況です。
 	```
-	$ docker-compose exec ap1d iris session iris -U%SYS	 
+	$ docker compose exec ap1d iris session iris -U%SYS	 
 	ノード: ap1d インスタンス: IRIS
 
 	%SYS>w ##class(SYS.Mirror).DistanceFromPrimaryJournalFiles()
@@ -65,7 +65,7 @@ $ ./start-dr.sh
 2. DR非同期メンバをフェイルオーバー・メンバに昇格
 
 ```
-$ docker-compose exec ap1d iris session iris -U%SYS	 
+$ docker compose exec ap1d iris session iris -U%SYS	 
 ノード: ap1d インスタンス: IRIS
 %SYS>w ##class(SYS.Mirror).Promote()
 1
@@ -79,8 +79,8 @@ BACKUP
 プライマリメンバのIRISインスタンス停止後、フェイルオーバにてバックアップメンバ(元DR非同期メンバ)がプライマリメンバになります。
 
 ```
-$ docker-compose exec ap1a iris stop iris quietly
-$ docker-compose exec ap1d iris session iris -U%SYS
+$ docker compose exec ap1a iris stop iris quietly
+$ docker compose exec ap1d iris session iris -U%SYS
 ノード: ap1d インスタンス: IRIS
 
 %SYS>w $system.Mirror.GetStatus()
@@ -102,8 +102,8 @@ SUCCESS
 元プライマリメンバのIRISインスタンス起動後、バックアップメンバとして参入します。
 
 ```
-$ docker-compose exec ap1a iris start iris
-$ docker-compose exec ap1a iris session iris -U%SYS
+$ docker compose exec ap1a iris start iris
+$ docker compose exec ap1a iris session iris -U%SYS
 ノード: ap1a インスタンス: IRIS
 %SYS>w $system.Mirror.GetStatus()
 BACKUP
@@ -114,7 +114,7 @@ BACKUP
 (1.)の"計画的フェイルオーバー前のチェック”と同様のチェックを行います。
 
 ```
-$ docker-compose exec ap1a iris session iris -U%SYS	 
+$ docker compose exec ap1a iris session iris -U%SYS	 
 ノード: ap1a インスタンス: IRIS
 
 %SYS>w $system.Mirror.GetMemberType()
@@ -122,7 +122,7 @@ Failover
 %SYS>w $system.Mirror.GetStatus()
 BACKUP
 
-$ docker-compose exec ap1d iris session iris -U%SYS	 
+$ docker compose exec ap1d iris session iris -U%SYS	 
 ノード: ap1d インスタンス: IRIS
 
 %SYS>w $system.Mirror.GetMemberType()
@@ -137,7 +137,7 @@ PRIMARY
 元プライマリメンバ(現バックアップメンバ)がプライマリメンバになり、現プライマリメンバがバックアップメンバになります。
 
 ```
-$ docker-compose exec ap1d iris restart iris
+$ docker compose exec ap1d iris restart iris
 ```
 
 8. ELB(クライアント接続先の変更) 、その他業務再開に必要な手順
@@ -153,7 +153,7 @@ FAILED
 9. バックアップメンバをDR非同期メンバに降格
 
 ```
-$ docker-compose exec ap1d iris session iris -U%SYS	 
+$ docker compose exec ap1d iris session iris -U%SYS	 
 ノード: ap1d インスタンス: IRIS
 
 %SYS>w $system.Mirror.GetMemberType()
@@ -173,8 +173,8 @@ CONNECTED
 1. DR非同期メンバをフェイルオーバー・メンバに昇格
 
 ```
-$ docker-compose exec ap1a iris force iris
-$ docker-compose exec ap1d iris session iris -U%SYS	
+$ docker compose exec ap1a iris force iris
+$ docker compose exec ap1d iris session iris -U%SYS	
 %SYS>w ##class(SYS.Mirror).PromoteWithNoPartner()
 1
 %SYS>w $system.Mirror.GetMemberType()
@@ -198,7 +198,7 @@ SUCCESS
 構成ファイルiris.cpfの[MirrorMember] セクションに ValidatedMember=0 を追加してインスタンスの起動を行います。
 
 ```
-$ docker-compose exec ap1a bash
+$ docker compose exec ap1a bash
 irisowner@ap1a:~$ grep ValidatedMember /usr/irissys/iris.cpf
 ValidatedMember=0
 $ iris start iris

@@ -58,7 +58,7 @@ ClassMethod BISetup(ns = "mirrorns") As %Status
   // will report compile error but it works
   w "++You can ignore compile erros here++",!
   Set tSC=$SYSTEM.OBJ.Load("/home/irisowner/Samples-BI/src/cls/HoleFoods/Utils.cls","ck") 
-	Do ##class(HoleFoods.Utils).BuildData(1000,0,1)
+  Do ##class(HoleFoods.Utils).BuildData(1000,0,1)
   w "--You can ignore compile erros here--",!
 
 	Set $NAMESPACE=oldns
